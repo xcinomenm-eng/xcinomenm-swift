@@ -37,13 +37,15 @@ public class XRPWallet {
     public var seed: String
     public var address: String
     public var mnemonic: String?
+    public var path: String?
     
-    private init(privateKey: String, publicKey: String, seed: String, address: String, mnemonic: String? = nil) {
+    private init(privateKey: String, publicKey: String, seed: String, address: String, mnemonic: String? = nil, path: String? = nil) {
         self.privateKey = privateKey
         self.publicKey = publicKey
         self.seed = seed
         self.address = address
         self.mnemonic = mnemonic
+        self.path = path
     }
 
     private convenience init(entropy: Entropy, type: SeedType) {
@@ -83,7 +85,7 @@ public class XRPWallet {
     ///
     /// - Parameter mnemonic: mnemonic phrase .
     /// - Throws: SeedError
-    public convenience init(mnemonic: String) throws {
+    public convenience init(mnemonic: String, path: String) throws {
         let seed = Mnemonic.createSeed(mnemonic: mnemonic)
         let bytes = [UInt8](seed)
         let entropy = Entropy(bytes: bytes)
@@ -95,7 +97,8 @@ public class XRPWallet {
             publicKey: keyPair.publicKey,
             seed: _seed,
             address: address,
-            mnemonic: mnemonic
+            mnemonic: mnemonic,
+            path: path
         )
     }
 
@@ -196,6 +199,7 @@ public class XRPWallet {
 
     public static func generateRandomMnemonicWallet() throws -> XRPWallet {
         let mnemonic = try Mnemonic.create()
-        return try! XRPWallet(mnemonic: mnemonic)
+        let path = "m/44'/60'/0'/0'/0"
+        return try! XRPWallet(mnemonic: mnemonic, path: path)
     }
 }
