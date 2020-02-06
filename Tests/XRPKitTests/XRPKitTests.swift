@@ -79,7 +79,8 @@ final class XRPKitTests: XCTestCase {
     func testGenerateWalletFromMnemonicNoDerivationPath() {
         do {
             let mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
-            let wallet = try XRPWallet(mnemonic: mnemonic)
+            let path = "m/44'/60'/0'/0'/0"
+            let wallet = try XRPWallet(mnemonic: mnemonic, path: path)
             XCTAssertNotNil(wallet)
             XCTAssertEqual(wallet.publicKey, "02cf92277a753c2e01052aa6fa6001a4c9ee17d4846d91d3f946271313d3b0fec8")
             XCTAssertEqual(wallet.privateKey, "007b55cc18dc95e7b850810d50f76168672162b259b8a3c9bffd2b53bcac10fe15")
@@ -92,7 +93,8 @@ final class XRPKitTests: XCTestCase {
     func testGenerateWalletFromMnemonicInvalidMnemonic() {
         do {
             let mnemonic = "xrp xrp xrp xrp xrp xrp xrp xrp xrp xrp xrp xrp"
-            let _ = try XRPWallet(mnemonic: mnemonic)
+            let path = "m/44'/60'/0'/0'/0"
+            let _ = try XRPWallet(mnemonic: mnemonic, path: path)
         } catch {
             XCTAssertTrue(
                 error is SeedError,
@@ -506,7 +508,8 @@ final class XRPKitTests: XCTestCase {
         // ================================================================================================
 
         let mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
-        let walletFromMnemonic = try! XRPWallet(mnemonic: mnemonic)
+        let path = "m/44'/60'/0'/0'/0"
+        let walletFromMnemonic = try! XRPWallet(mnemonic: mnemonic, path: path)
         
         
         // ================================================================================================
