@@ -39,7 +39,7 @@ Pod::Spec.new do |s|
   #   'XRPKit' => ['XRPKit/Assets/*.png']
   # }
 
-  s.dependency 'secp256k1.swift'
+  s.dependency 'secp256k1.swift', '~> 0.1.4'
   s.dependency 'CryptoSwift'
   s.dependency 'BigInt'
   s.dependency 'AnyCodable-FlightSchool'
