@@ -30,6 +30,12 @@ public enum SeedType {
 
 }
 
+public enum PathType: String {
+    case main
+    case test
+    case dev
+}
+
 public class XRPWallet {
 
     public var privateKey: String
@@ -37,15 +43,16 @@ public class XRPWallet {
     public var seed: String
     public var address: String
     public var mnemonic: String?
-    public var path: String?
-    
-    private init(privateKey: String, publicKey: String, seed: String, address: String, mnemonic: String? = nil, path: String? = nil) {
+    public var derivationPath: PathType?
+
+    private init(privateKey: String, publicKey: String, seed: String, address: String, mnemonic: String? = nil, derivationPath: PathType? = nil) {
         self.privateKey = privateKey
         self.publicKey = publicKey
         self.seed = seed
         self.address = address
         self.mnemonic = mnemonic
-        self.path = path
+        self.derivationPath = derivationPath
+
     }
 
     private convenience init(entropy: Entropy, type: SeedType) {
@@ -85,7 +92,7 @@ public class XRPWallet {
     ///
     /// - Parameter mnemonic: mnemonic phrase .
     /// - Throws: SeedError
-    public convenience init(mnemonic: String, path: String) throws {
+    public convenience init(mnemonic: String, derivationPath: PathType) throws {
         let seed = Mnemonic.createSeed(mnemonic: mnemonic)
         let bytes = [UInt8](seed)
         let entropy = Entropy(bytes: bytes)
@@ -98,7 +105,7 @@ public class XRPWallet {
             seed: _seed,
             address: address,
             mnemonic: mnemonic,
-            path: path
+            derivationPath: derivationPath
         )
     }
 
@@ -190,16 +197,27 @@ public class XRPWallet {
         throw SeedError.invalidSeed
     }
 
-
     public static func getSeedTypeFrom(publicKey: String) -> SeedType {
         let data = [UInt8](publicKey.hexadecimal!)
         // FIXME: Is this correct?
         return data.count == 33 && data[0] == 0xED ? .ed25519 : .secp256k1
     }
 
-    public static func generateRandomMnemonicWallet() throws -> XRPWallet {
+    public static func generateRandomMnemonicWallet(path: PathType) throws -> XRPWallet {
         let mnemonic = try Mnemonic.create()
-        let path = "m/44'/60'/0'/0'/0"
-        return try! XRPWallet(mnemonic: mnemonic, path: path)
+        return try! XRPWallet(mnemonic: mnemonic, derivationPath: path)
+    }
+}
+
+extension PathType {
+    public func getPath() -> String {
+        switch self {
+        case .main:
+            return "m/44'/60'/0'/0'/0"
+        case .test:
+            return "m/44'/60'/0'/0'/1"
+        case .dev:
+            return "m/44'/60'/0'/0'/2"
+        }
     }
 }
