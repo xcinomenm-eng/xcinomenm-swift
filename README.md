@@ -8,14 +8,17 @@
   <a href="https://cocoapods.org/pods/XRPKit">
     <img src="https://img.shields.io/cocoapods/v/XRPKit.svg?style=flat&label=version" alt="Version">
   </a>
-  <a href="https://cocoapods.org/pods/XRPKit">
+  <a href="https://github.com/MitchLang009/XRPKit">
     <img src="https://img.shields.io/cocoapods/l/XRPKit.svg?style=flat" alt="License">
   </a>
-  <a href="https://cocoapods.org/pods/XRPKit">
+  <a href="https://github.com/MitchLang009/XRPKit">
     <img src="https://img.shields.io/badge/platforms-macOS%20%7C%20iOS%20%7C%20watchOS%20%7C%20tvOS%20%7C%20Linux-lightgrey.svg" alt="Platform">
   </a>
   <a href="https://cocoapods.org/pods/XRPKit">
     <img src="https://img.shields.io/badge/supports-CocoaPods%20%7C%20SwiftPM-green.svg" alt="CocoaPods and SPM compatible">
+  </a>
+   <a href="https://github.com/MitchLang009/XRPKit">
+    <img src="https://travis-ci.org/MitchLang009/XRPKit.svg?branch=develop" alt="Travis Build Status">
   </a>
 </p>
 
@@ -146,13 +149,8 @@ import XRPKit
 let wallet = try! XRPWallet(seed: "shrKftFK3ZkMPkq4xe5wGB8HaNSLf")
 let amount = try! XRPAmount(drops: 100000000)
 
-XRPTransaction.send(from: wallet, to: "rPdCDje24q4EckPNMQ2fmUAMDoGCCu3eGK", amount: amount) { (result) in
-    switch result {
-    case .success(let txResult):
-        print(txResult)
-    case .failure(let error):
-        print(error)
-    }
+_ = XRPPayment(from: wallet, to: "rPdCDje24q4EckPNMQ2fmUAMDoGCCu3eGK", amount: amount).send().map { (result) in
+    print(result)
 }
 
 ```
@@ -176,19 +174,14 @@ let fields: [String:Any] = [
 ]
 
 // create the transaction (offline)
-let transaction = XRPTransaction(fields: fields)
+let transaction = XRPRawTransaction(fields: fields)
 
 // sign the transaction (offline)
 let signedTransaction = try! transaction.sign(wallet: wallet)
-    
+
 // submit the transaction (online)
-signedTransaction.submit { (result) in
-    switch result {
-    case .success(let txResult):
-        print(txResult)
-    case .failure(let error):
-        print(error)
-    }
+_ = signedTransaction.submit().map { (result) in
+    print(result)
 }
 
 ```
@@ -203,7 +196,7 @@ import XRPKit
 let wallet = try! XRPWallet(seed: "shrKftFK3ZkMPkq4xe5wGB8HaNSLf")
 
 // dictionary containing partial transaction fields
-let fields: [String:Any] = [
+let partialFields: [String:Any] = [
     "TransactionType" : "Payment",
     "Destination" : "rPdCDje24q4EckPNMQ2fmUAMDoGCCu3eGK",
     "Amount" : "100000000",
@@ -211,28 +204,14 @@ let fields: [String:Any] = [
 ]
 
 // create the transaction from dictionary
-let partialTransaction = XRPTransaction(fields: fields)
+let partialTransaction = XRPTransaction(wallet: wallet, fields: partialFields)
 
-// autofill missing transaction fields (online)
-partialTransaction.autofill(address: wallet.address, completion: { (result) in
-    switch result {
-    case .success(let transaction):
-        // sign the transaction (offline)
-        let signedTransaction = try! transaction.sign(wallet: wallet)
-        
-        // submit the signed transaction (online)
-        signedTransaction.submit(completion: { (result) in
-            switch result {
-            case .success(let txResult):
-                print(txResult)
-            case .failure(let error):
-                print(error)
-            }
-        })
-    case .failure(let error):
-        print(error)
-    }
-})
+// autofills missing transaction fields (online)
+// signs transaction (offline)
+// submits transaction (online)
+_ = partialTransaction.send().map { (txResult) in
+    print(txResult)
+}
 
 ```
 
@@ -272,13 +251,8 @@ partialTransaction.autofill(address: wallet.address, completion: { (result) in
 
 import XRPKit
 
-XRPLedger.getBalance(address: "rPdCDje24q4EckPNMQ2fmUAMDoGCCu3eGK") { (result) in
-    switch result {
-    case .success(let amount):
-        print(amount.prettyPrinted()) // 1,800.000000
-    case .failure(let error):
-        print(error)
-    }
+_ = XRPLedger.getBalance(address: "rPdCDje24q4EckPNMQ2fmUAMDoGCCu3eGK").map { (amount) in
+    print(amount.prettyPrinted()) // 1,800.000000
 }
 
 ```
