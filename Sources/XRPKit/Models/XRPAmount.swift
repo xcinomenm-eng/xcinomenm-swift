@@ -46,7 +46,7 @@ public struct XRPAmount {
 
     }
     
-    public func prettyPrinted() -> String {
+    public func toString() -> String {
         let drops = self.drops%1000000
         let xrp = self.drops/1000000
         let numberFormatter = NumberFormatter()
@@ -54,6 +54,15 @@ public struct XRPAmount {
         let formattedNumber = numberFormatter.string(from: NSNumber(value: xrp))!
         let leadingZeros: [Character] = Array(repeating: "0", count: 6 - String(drops).count)
         return formattedNumber + "." + String(leadingZeros) + String(drops)
+    }
+    
+    public func toDrops() -> Int {
+        return self.drops
+    }
+    
+    public func toXrp() -> Double {
+        let xrp = self.drops/1000000
+        return xrp
     }
 
 }
