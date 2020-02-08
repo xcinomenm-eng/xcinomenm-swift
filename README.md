@@ -105,6 +105,18 @@ let walletFromMnemonic = try! XRPWallet(mnemonic: mnemonic)
 
 ```
 
+### Registered path types
+
+These are the default registered path types for usage in XRPKit of BIP44
+
+All these constants are used as hardened derivation.
+
+index  | hexa (String) | network
+------------- | | -------------
+0  | "m/44'/60'/0'/0'/0" | XRP
+1  | "m/44'/60'/0'/0'/1" | XRP Testnet
+2  | "m/44'/60'/0'/0'/2" | XRP Devnet
+
 ### Wallet properties
 ```swift
 
@@ -215,7 +227,7 @@ _ = partialTransaction.send().map { (txResult) in
 
 ```
 
-### Transaction Result 
+### Transaction Result
 
 ```swift
 
@@ -300,25 +312,25 @@ import XRPKit
 class MyClass: XRPWebSocketDelegate {
 
     func onConnected(connection: XRPWebSocket) {
-        
+
     }
-    
+
     func onDisconnected(connection: XRPWebSocket, error: Error?) {
-        
+
     }
-    
+
     func onError(connection: XRPWebSocket, error: Error) {
-        
+
     }
-    
+
     func onResponse(connection: XRPWebSocket, response: XRPWebSocketResponse) {
-        
+
     }
-    
+
     func onStream(connection: XRPWebSocket, object: NSDictionary) {
-        
+
     }
-    
+
 }
 
 ```
