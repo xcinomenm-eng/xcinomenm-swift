@@ -30,12 +30,6 @@ public enum SeedType {
 
 }
 
-public enum PathType: String {
-    case main
-    case test
-    case dev
-}
-
 public class XRPWallet {
 
     public var privateKey: String
@@ -43,16 +37,17 @@ public class XRPWallet {
     public var seed: String
     public var address: String
     public var mnemonic: String?
-    public var derivationPath: PathType?
-
-    private init(privateKey: String, publicKey: String, seed: String, address: String, mnemonic: String? = nil, derivationPath: PathType? = nil) {
+    internal var accountID: [UInt8] {
+        let accountID = RIPEMD160.hash(message: Data(hex: self.publicKey).sha256())
+        return [UInt8](accountID)
+    }
+    
+    private init(privateKey: String, publicKey: String, seed: String, address: String, mnemonic: String? = nil) {
         self.privateKey = privateKey
         self.publicKey = publicKey
         self.seed = seed
         self.address = address
         self.mnemonic = mnemonic
-        self.derivationPath = derivationPath
-
     }
 
     private convenience init(entropy: Entropy, type: SeedType) {
@@ -92,7 +87,7 @@ public class XRPWallet {
     ///
     /// - Parameter mnemonic: mnemonic phrase .
     /// - Throws: SeedError
-    public convenience init(mnemonic: String, derivationPath: PathType) throws {
+    public convenience init(mnemonic: String) throws {
         let seed = Mnemonic.createSeed(mnemonic: mnemonic)
         let bytes = [UInt8](seed)
         let entropy = Entropy(bytes: bytes)
@@ -104,8 +99,7 @@ public class XRPWallet {
             publicKey: keyPair.publicKey,
             seed: _seed,
             address: address,
-            mnemonic: mnemonic,
-            derivationPath: derivationPath
+            mnemonic: mnemonic
         )
     }
 
@@ -115,11 +109,19 @@ public class XRPWallet {
     /// - Returns: standard XRP address encoded using XRP alphabet
     ///
     public static func deriveAddress(publicKey: String) -> String {
-        let accountID = Data([0x00]) + RIPEMD160.hash(message: Data(hex: publicKey).sha256())
-        let checksum = Data(accountID).sha256().sha256().prefix(through: 3)
-        let addrrssData = accountID + checksum
+        let accountID = RIPEMD160.hash(message: Data(hex: publicKey).sha256())
+        let prefixedAccountID = Data([0x00]) + accountID
+        let checksum = Data(prefixedAccountID).sha256().sha256().prefix(through: 3)
+        let addrrssData = prefixedAccountID + checksum
         let address = String(base58Encoding: addrrssData)
         return address
+    }
+    
+    static func accountID(for address: String) ->  [UInt8] {
+        let data = Data(base58Decoding: address)!
+        let withoutCheck = data.prefix(data.count-4)
+        let withoutPrefix = withoutCheck.suffix(from: 1)
+        return withoutPrefix.bytes
     }
 
     /// Validates a String is a valid XRP address.
@@ -197,27 +199,15 @@ public class XRPWallet {
         throw SeedError.invalidSeed
     }
 
+
     public static func getSeedTypeFrom(publicKey: String) -> SeedType {
         let data = [UInt8](publicKey.hexadecimal!)
         // FIXME: Is this correct?
         return data.count == 33 && data[0] == 0xED ? .ed25519 : .secp256k1
     }
 
-    public static func generateRandomMnemonicWallet(path: PathType) throws -> XRPWallet {
+    public static func generateRandomMnemonicWallet() throws -> XRPWallet {
         let mnemonic = try Mnemonic.create()
-        return try! XRPWallet(mnemonic: mnemonic, derivationPath: path)
-    }
-}
-
-extension PathType {
-    public func getPath() -> String {
-        switch self {
-        case .main:
-            return "m/44'/60'/0'/0'/0"
-        case .test:
-            return "m/44'/60'/0'/0'/1"
-        case .dev:
-            return "m/44'/60'/0'/0'/2"
-        }
+        return try! XRPWallet(mnemonic: mnemonic)
     }
 }
