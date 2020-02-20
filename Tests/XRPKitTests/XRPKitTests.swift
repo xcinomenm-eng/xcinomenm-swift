@@ -194,49 +194,49 @@ final class XRPKitTests: XCTestCase {
         XCTAssert(date.timeIntervalSinceRippleEpoch == UInt64(563846400))
     }
 
-//    func testEscrowCreateFinish() {
-//        let exp = expectation(description: "Testing \(#function)")
-//
-//        let wallet = try! XRPSeedWallet(seed: "sEdVLSxBzx6Xi9XTqYj6a88epDSETKR")
-//        let amount = try! XRPAmount(drops: 1100000)
-//        let address = try! XRPAddress(rAddress: "rUQyLm1pnvFPcYgAFFVu7MvBgEYqWEfrjp")
-//        let create = XRPEscrowCreate(from: wallet, to: address, amount: amount, finishAfter: Date().addingTimeInterval(TimeInterval(5)), cancelAfter: nil)
-//        _ = create.send().map { (dict) in
-//            DispatchQueue.main.asyncAfter(deadline: .now()+10) {
-//                let txJSON = dict["tx_json"] as! NSDictionary
-//                let sequence = txJSON["Sequence"] as! UInt32
-//                print(txJSON)
-//                let finish = XRPEscrowFinish(using: wallet, owner: wallet.address, offerSequence: sequence)
-//                _ = finish.send().map { (dict) in
-//                    print(dict)
-//                    exp.fulfill()
-//                }
-//            }
-//        }
-//        waitForExpectations(timeout: 30)
-//    }
-//
-//    func testEscrowCreateCancel() {
-//        let exp = expectation(description: "Testing \(#function)")
-//
-//        let wallet = try! XRPSeedWallet(seed: "sEdVLSxBzx6Xi9XTqYj6a88epDSETKR")
-//        let amount = try! XRPAmount(drops: 1100000)
-//        let address = try! XRPAddress(rAddress: "rUQyLm1pnvFPcYgAFFVu7MvBgEYqWEfrjp")
-//        let create = XRPEscrowCreate(from: wallet, to: address, amount: amount, finishAfter: Date().addingTimeInterval(TimeInterval(4)), cancelAfter: Date().addingTimeInterval(TimeInterval(5)))
-//        _ = create.send().map { (dict) in
-//            DispatchQueue.main.asyncAfter(deadline: .now()+10) {
-//                let txJSON = dict["tx_json"] as! NSDictionary
-//                let sequence = txJSON["Sequence"] as! UInt32
-//                print(txJSON)
-//                let finish = XRPEscrowCancel(using: wallet, owner: wallet.address, offerSequence: sequence)
-//                _ = finish.send().map { (dict) in
-//                    print(dict)
-//                    exp.fulfill()
-//                }
-//            }
-//        }
-//        waitForExpectations(timeout: 30)
-//    }
+    func testEscrowCreateFinish() {
+        let exp = expectation(description: "Testing \(#function)")
+
+        let wallet = try! XRPSeedWallet(seed: .testOneSeed)
+        let amount = try! XRPAmount(drops: .testAmount)
+        let address = try! XRPAddress(rAddress: .testRAddress)
+        let create = XRPEscrowCreate(from: wallet, to: address, amount: amount, finishAfter: Date().addingTimeInterval(TimeInterval(5)), cancelAfter: nil)
+        _ = create.send().map { (dict) in
+            DispatchQueue.main.asyncAfter(deadline: .now()+10) {
+                let txJSON = dict["tx_json"] as! NSDictionary
+                let sequence = txJSON["Sequence"] as! UInt32
+                print(txJSON)
+                let finish = XRPEscrowFinish(using: wallet, owner: wallet.address, offerSequence: sequence)
+                _ = finish.send().map { (dict) in
+                    print(dict)
+                    exp.fulfill()
+                }
+            }
+        }
+        waitForExpectations(timeout: 30)
+    }
+
+    func testEscrowCreateCancel() {
+        let exp = expectation(description: "Testing \(#function)")
+
+        let wallet = try! XRPSeedWallet(seed: .testOneSeed)
+        let amount = try! XRPAmount(drops: .testAmount)
+        let address = try! XRPAddress(rAddress: .testRAddress)
+        let create = XRPEscrowCreate(from: wallet, to: address, amount: amount, finishAfter: Date().addingTimeInterval(TimeInterval(4)), cancelAfter: Date().addingTimeInterval(TimeInterval(5)))
+        _ = create.send().map { (dict) in
+            DispatchQueue.main.asyncAfter(deadline: .now()+10) {
+                let txJSON = dict["tx_json"] as! NSDictionary
+                let sequence = txJSON["Sequence"] as! UInt32
+                print(txJSON)
+                let finish = XRPEscrowCancel(using: wallet, owner: wallet.address, offerSequence: sequence)
+                _ = finish.send().map { (dict) in
+                    print(dict)
+                    exp.fulfill()
+                }
+            }
+        }
+        waitForExpectations(timeout: 30)
+    }
 
     func testGetPendingEscrows() {
         let exp = expectation(description: "Testing \(#function)")
@@ -256,8 +256,8 @@ final class XRPKitTests: XCTestCase {
     func testPaymentChannelCreateSuccess() {
         let exp = expectation(description: "Testing \(#function)")
 
-        let wallet = try! XRPWallet(seed: .testOneSeed)
-        let destWallet = try! XRPWallet(seed: .testTwoSeed)
+        let wallet = try! XRPSeedWallet(seed: .testOneSeed)
+        let destWallet = try! XRPSeedWallet(seed: .testTwoSeed)
         let amount = try! XRPAmount(drops: .testAmount)
         let address = try! XRPAddress(rAddress: destWallet.address)
         let settleDelay = Date().addingTimeInterval(TimeInterval(4))
@@ -288,8 +288,8 @@ final class XRPKitTests: XCTestCase {
                     }
                     for node in affectedNodes {
                         guard let createdNode = node["CreatedNode"] as? NSDictionary else {
-                            XCTFail("Failed retrieving transaction created node")
-                            return
+                            print("Not Created Node... Continuing...")
+                            continue
                         }
                         guard let ledgerEntryType = createdNode["LedgerEntryType"] as? String else {
                             XCTFail("Failed retrieving created node ledger entry type")
@@ -308,13 +308,13 @@ final class XRPKitTests: XCTestCase {
                 }
             }
         }
-        waitForExpectations(timeout: 300)
+        waitForExpectations(timeout: 30)
     }
 
     func testGetAccountChannels() {
         let exp = expectation(description: "Testing \(#function)")
 
-        let wallet = try! XRPWallet(seed: .testOneSeed)
+        let wallet = try! XRPSeedWallet(seed: .testOneSeed)
         let address = try! XRPAddress(rAddress: .testRAddress)
         _ = XRPLedger.getAccountChannels(account: wallet.address, address: address.rAddress).map { (dict) in
             print(dict)
@@ -327,8 +327,8 @@ final class XRPKitTests: XCTestCase {
         let exp = expectation(description: "Testing \(#function)")
 
         let amount = try! XRPAmount(drops: .testAmount)
-        let wallet = try! XRPWallet(seed: .testOneSeed)
-        let destWallet = try! XRPWallet(seed: .testTwoSeed)
+        let wallet = try! XRPSeedWallet(seed: .testOneSeed)
+        let destWallet = try! XRPSeedWallet(seed: .testTwoSeed)
         _ = XRPLedger.authorizeChannelClaim(
             channel: .testChannelID,
             secret: wallet.seed,
@@ -391,8 +391,8 @@ final class XRPKitTests: XCTestCase {
     func testVerifyChannelFunds() {
         let exp = expectation(description: "Testing \(#function)")
 
-        let wallet = try! XRPWallet(seed: .testOneSeed)
-        let destWallet = try! XRPWallet(seed: .testTwoSeed)
+        let wallet = try! XRPSeedWallet(seed: .testOneSeed)
+        let destWallet = try! XRPSeedWallet(seed: .testTwoSeed)
         _ = XRPLedger.getAccountChannels(account: wallet.address, address: destWallet.address).map { (dict) in
             print(dict["channels"])
             guard let channels = dict["channels"] as? NSArray else {
@@ -413,8 +413,8 @@ final class XRPKitTests: XCTestCase {
     func testPaymentChannelClaimSuccess() {
         let exp = expectation(description: "Testing \(#function)")
 
-        let wallet = try! XRPWallet(seed: .testOneSeed)
-        let destWallet = try! XRPWallet(seed: .testTwoSeed)
+        let wallet = try! XRPSeedWallet(seed: .testOneSeed)
+        let destWallet = try! XRPSeedWallet(seed: .testTwoSeed)
         let amount = try! XRPAmount(drops: .testAmount)
         let address = try! XRPAddress(rAddress: destWallet.address)
         let settleDelay = Date().addingTimeInterval(TimeInterval(4))
@@ -436,18 +436,19 @@ final class XRPKitTests: XCTestCase {
                 //                print(hash)
                 guard let validated = dict["validated"] as? Int, validated.boolValue == true else {
                     XCTFail("Failed payment channel claim transaction not validated")
+                    exp.fulfill()
                     return
                 }
                 exp.fulfill()
             }
         }
-        waitForExpectations(timeout: 300)
+        waitForExpectations(timeout: 30)
     }
 
     func testTransactionHistory() {
         let exp = expectation(description: "Testing \(#function)")
 
-        let wallet = try! XRPWallet(seed: .testOneSeed)
+        let wallet = try! XRPSeedWallet(seed: .testOneSeed)
         _ = XRPLedger.getTxs(account: wallet.address).map { (txs) in
             exp.fulfill()
         }
@@ -730,7 +731,7 @@ final class XRPKitTests: XCTestCase {
         let exp = expectation(description: "Loading stories")
 
         // call my asynchronous method
-        let wallet = try! XRPWallet(seed: .testOneSeed)
+        let wallet = try! XRPSeedWallet(seed: .testOneSeed)
         _ = XRPLedger.getAccountInfo(account: wallet.address).map { (info) in
             print(info)
             exp.fulfill()
@@ -745,7 +746,7 @@ final class XRPKitTests: XCTestCase {
         let exp = expectation(description: "Loading stories")
 
         // call my asynchronous method
-        let wallet = try! XRPWallet(seed: .testOneSeed)
+        let wallet = try! XRPSeedWallet(seed: .testOneSeed)
         print(wallet.address)
         print(wallet.seed)
         print(wallet.privateKey)
@@ -965,7 +966,7 @@ final class XRPKitTests: XCTestCase {
     }
 
     func testFundWallet() {
-        let ED_wallet = try! XRPWallet(seed: .testOneSeed)
+        let ED_wallet = try! XRPSeedWallet(seed: .testOneSeed)
         print(ED_wallet.address)
         print(ED_wallet.seed)
         print(ED_wallet.privateKey)
