@@ -1,3 +1,4 @@
+
 import XCTest
 @testable import XRPKit
 
@@ -57,8 +58,8 @@ final class XRPKitTests: XCTestCase {
         ("readMe", ReadMe),
         ("testSendTx", testSendTx),
         ("testRippleEpoch", testRippleEpoch),
-        //        ("testEscrowCreateFinish", testEscrowCreateFinish),
-        //        ("testEscrowCreateCancel", testEscrowCreateCancel),
+//        ("testEscrowCreateFinish", testEscrowCreateFinish),
+//        ("testEscrowCreateCancel", testEscrowCreateCancel),
         ("testGetPendingEscrows", testGetPendingEscrows),
         ("testTransactionHistory", testTransactionHistory),
         ("testDisableMaster", testDisableMaster),
@@ -110,11 +111,11 @@ final class XRPKitTests: XCTestCase {
             .autofill()
             .map({ (tx) in
                 let _tx = try! tx
-                    .addMultiSignSignature(wallet: signer3)
-                    .addMultiSignSignature(wallet: signer1)
-                    .addMultiSignSignature(wallet: signer2)
-                    .submit()
-                    .map { (dict) in
+                .addMultiSignSignature(wallet: signer3)
+                .addMultiSignSignature(wallet: signer1)
+                .addMultiSignSignature(wallet: signer2)
+                .submit()
+                .map { (dict) in
                         print(dict)
                         exp.fulfill()
                 }
@@ -129,8 +130,8 @@ final class XRPKitTests: XCTestCase {
         XRPAccountSet(wallet: wallet, set: .asfDisableMaster)
             .send()
             .map { (dict) in
-                print(dict)
-                exp.fulfill()
+            print(dict)
+            exp.fulfill()
         }
         waitForExpectations(timeout: 10)
     }
@@ -752,7 +753,7 @@ final class XRPKitTests: XCTestCase {
         print(wallet.privateKey)
         print(wallet.publicKey)
         let amount = try! XRPAmount(drops: 1000000)
-        let address = try! XRPAddress(rAddress: .testRAddress, tag: 43)
+        let address = try! XRPAddress(rAddress: "rUQyLm1pnvFPcYgAFFVu7MvBgEYqWEfrjp", tag: 43)
         _ = XRPPayment(from: wallet, to: address, amount: amount, sourceTag: 67).send().map({ (dict) in
             print(dict)
             exp.fulfill()
@@ -771,47 +772,47 @@ final class XRPKitTests: XCTestCase {
 
     func testXAddress() {
         let mainNetTests = [
-            [
-                nil,
-                "XVLhHMPHU98es4dbozjVtdWzVrDjtV5fdx1mHp98tDMoQXb",
-                "A066C988C712815CC37AF71472B7CBBBD4E2A0A000000000000000000",
-            ],[
-                0,
-                "XVLhHMPHU98es4dbozjVtdWzVrDjtV8AqEL4xcZj5whKbmc",
-                "A066C988C712815CC37AF71472B7CBBBD4E2A0A010000000000000000",
-            ],[
-                1,
-                "XVLhHMPHU98es4dbozjVtdWzVrDjtV8xvjGQTYPiAx6gwDC",
-                "A066C988C712815CC37AF71472B7CBBBD4E2A0A010100000000000000",
-            ],[
-                2,
-                "XVLhHMPHU98es4dbozjVtdWzVrDjtV8zpDURx7DzBCkrQE7",
-                "A066C988C712815CC37AF71472B7CBBBD4E2A0A010200000000000000",
-            ],[
-                32,
-                "XVLhHMPHU98es4dbozjVtdWzVrDjtVoYiC9UvKfjKar4LJe",
-                "A066C988C712815CC37AF71472B7CBBBD4E2A0A012000000000000000",
-            ],[
-                276,
-                "XVLhHMPHU98es4dbozjVtdWzVrDjtVoKj3MnFGMXEFMnvJV",
-                "A066C988C712815CC37AF71472B7CBBBD4E2A0A011401000000000000",
-            ],[
-                65591,
-                "XVLhHMPHU98es4dbozjVtdWzVrDjtVozpjdhPQVdt3ghaWw",
-                "A066C988C712815CC37AF71472B7CBBBD4E2A0A013700010000000000",
-            ],[
-                16781933,
-                "XVLhHMPHU98es4dbozjVtdWzVrDjtVqrDUk2vDpkTjPsY73",
-                "A066C988C712815CC37AF71472B7CBBBD4E2A0A016D12000100000000",
-            ],[
-                4294967294,
-                "XVLhHMPHU98es4dbozjVtdWzVrDjtV1kAsixQTdMjbWi39u",
-                "A066C988C712815CC37AF71472B7CBBBD4E2A0A01FEFFFFFF00000000",
-            ],[
-                4294967295,
-                "XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi",
-                "A066C988C712815CC37AF71472B7CBBBD4E2A0A01FFFFFFFF00000000",
-            ]
+        [
+        nil,
+        "XVLhHMPHU98es4dbozjVtdWzVrDjtV5fdx1mHp98tDMoQXb",
+        "A066C988C712815CC37AF71472B7CBBBD4E2A0A000000000000000000",
+        ],[
+        0,
+        "XVLhHMPHU98es4dbozjVtdWzVrDjtV8AqEL4xcZj5whKbmc",
+        "A066C988C712815CC37AF71472B7CBBBD4E2A0A010000000000000000",
+        ],[
+        1,
+        "XVLhHMPHU98es4dbozjVtdWzVrDjtV8xvjGQTYPiAx6gwDC",
+        "A066C988C712815CC37AF71472B7CBBBD4E2A0A010100000000000000",
+        ],[
+        2,
+        "XVLhHMPHU98es4dbozjVtdWzVrDjtV8zpDURx7DzBCkrQE7",
+        "A066C988C712815CC37AF71472B7CBBBD4E2A0A010200000000000000",
+        ],[
+        32,
+        "XVLhHMPHU98es4dbozjVtdWzVrDjtVoYiC9UvKfjKar4LJe",
+        "A066C988C712815CC37AF71472B7CBBBD4E2A0A012000000000000000",
+        ],[
+        276,
+        "XVLhHMPHU98es4dbozjVtdWzVrDjtVoKj3MnFGMXEFMnvJV",
+        "A066C988C712815CC37AF71472B7CBBBD4E2A0A011401000000000000",
+        ],[
+        65591,
+        "XVLhHMPHU98es4dbozjVtdWzVrDjtVozpjdhPQVdt3ghaWw",
+        "A066C988C712815CC37AF71472B7CBBBD4E2A0A013700010000000000",
+        ],[
+        16781933,
+        "XVLhHMPHU98es4dbozjVtdWzVrDjtVqrDUk2vDpkTjPsY73",
+        "A066C988C712815CC37AF71472B7CBBBD4E2A0A016D12000100000000",
+        ],[
+        4294967294,
+        "XVLhHMPHU98es4dbozjVtdWzVrDjtV1kAsixQTdMjbWi39u",
+        "A066C988C712815CC37AF71472B7CBBBD4E2A0A01FEFFFFFF00000000",
+        ],[
+        4294967295,
+        "XVLhHMPHU98es4dbozjVtdWzVrDjtV18pX8yuPT7y4xaEHi",
+        "A066C988C712815CC37AF71472B7CBBBD4E2A0A01FFFFFFFF00000000",
+        ]
         ]
         let rootAccount = "rGWrZyQqhTp9Xu7G5Pkayo7bXjH4k4QYpf"
         for test in mainNetTests {
